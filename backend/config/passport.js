@@ -17,7 +17,7 @@ module.exports = app => {
       .catch(err => done(err, false))
   })
 
-  passport.user(strategy)
+  passport.use(strategy)
 
   return {
     authenticate: () => passport.authenticate('jwt', { session: false})

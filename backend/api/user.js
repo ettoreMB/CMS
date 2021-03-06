@@ -13,13 +13,15 @@ module.exports = app => {
     const user = {...req.body }
     if(req.params.id) user.id = req.params.id
 
+    if(!req.originalUrl.startWith('/users')) user.admin = false
+    if(!req.user || !req.user.admin) user.admin = false
+
     try {
       existisOrError(user.name, 'Nome não informado');
       existisOrError(user.email, 'E-mail não informado');
       existisOrError(user.password, 'Senha não informada');
       existisOrError(user.confirmPassword, 'Confirmação inválida')
-      equalsOrError(user.password, user.confirmPassword,
-                    'Senhas não conferem')
+      equalsOrError(user.password, user.confirmPassword,'Senhas não conferem')
 
       const userFromDB = await app.db('users')
             .where({ email: user.email}).first()
@@ -38,6 +40,7 @@ module.exports = app => {
       app.db('users')
         .update(user)
         .where({id: user.id})
+        .whereNull('deletedAt')
         .then(_=> res.status(204).send())
         .catch(err => res.status(500).send(err))
     } else {
@@ -51,6 +54,7 @@ module.exports = app => {
   const get = (req,res) => {
     app.db('users')
       .select('id', 'name', 'email', 'admin')
+      .whereNull('deletedAt')
       .then(users => res.json(users))
       .catch(err => res.status(500).send(err))
   }
@@ -58,11 +62,29 @@ module.exports = app => {
   const getById = (req, res) => {
     app.db('users')
     .select('id', 'name', 'email', 'admin')
+    .whereNull('deletedAt')
     .where({id: req.params.id})
     .first()
     .then(users => res.json(users))
     .catch(err => res.status(500).send(err))
   }
 
-  return {save, get, getById}
+  const remove = async(req, res) => {
+    try {
+      const articles = await app.db('articles')
+        .where( {userId: req.params.id})
+        notExistsOrError(articles, 'Usuário possui artigos!')
+
+        const rowsUpdated = app.db('users')
+          .update( {deletedAt: new Date()})
+          .where({id: req.params.id})
+          existisOrError(rowsUpdated, 'User not Found')
+
+          res.status(404).send()
+    } catch (error) {
+      res.status(401).send(error)
+    }
+  }
+
+  return {save, get, getById, remove}
 }
