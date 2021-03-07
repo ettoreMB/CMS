@@ -1,6 +1,6 @@
 <template>
-	<div id="app">
-		<Header title="CMS-COD3R" />
+	<div id="app" :class="{'hide-menu' :!isMenuVisible}">
+		<Header title="CMS-COD3R" :hideToggle="true" />
 		<Menu />
 		<Content />
 		<Footer />
@@ -8,15 +8,17 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 import Header from './components/template/Header'
 import Content from './components/template/Content'
 import Menu from './components/template/Menu'
-import Footer from "./components/template/Footer";
+import Footer from "./components/template/Footer"
 
 export default {
 	name: "App",
-	components: {Header, Content, Menu, Footer}
-}
+	components: {Header, Content, Menu, Footer},
+	computed: mapState(['isMenuVisible']),
+ }
 </script>
 
 <style>
@@ -39,5 +41,12 @@ export default {
 			"header header"
 			"menu content"
 			"menu footer";
+		}
+
+		#app.hide-menu {
+			grid-template-areas: 
+				"header header"
+				"content content"
+				"footer footer";
 		}
 </style>
