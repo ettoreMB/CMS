@@ -7,16 +7,20 @@
     <h1 class="title">
        {{title}}
     </h1>
-
+    <UserDropDown  v-if="!hideUserDropdown"/>
   </header>
 </template>
 
 <script>
+import UserDropDown from './UserDropDown'
+
 export default {
   name: "Header",
+  components: {UserDropDown},
   props: {
      title: String, 
-     hideToogle: Boolean, 
+     hideToogle: Boolean,
+     hideUserDropdown: Boolean,
   }, 
   computed: {
     icon() {

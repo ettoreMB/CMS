@@ -1,6 +1,10 @@
 <template>
 	<div id="app" :class="{'hide-menu' :!isMenuVisible}">
-		<Header title="CMS-COD3R" :hideToggle="true" />
+		<Header 
+			title="CMS-COD3R" 
+			:hideToggle="true"
+			:hideUserDrodown="true"
+		/>
 		<Menu />
 		<Content />
 		<Footer />
